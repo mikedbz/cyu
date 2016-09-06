@@ -1,0 +1,66 @@
+<?php
+$username='20121043226';
+$password='d003019';
+
+$cookie_file = dirname(__FILE__) ."/$username-cookie.txt"; 
+//模拟登录 
+
+
+
+
+			$ch = curl_init("http://auth.cyu.edu.cn/authserver/login?service=http://i.cyu.edu.cn/alone.portal?.pen=pe155") ;
+			curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36');			
+			curl_setopt($ch,CURLOPT_HEADER,0);
+			curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file); 		
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1) ; // 获取数据返回
+			curl_setopt($ch, CURLOPT_BINARYTRANSFER, 0) ; // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
+			$con=curl_exec($ch);
+			
+			$preg_lt='/<input type="hidden" name="lt" value="(.*)"\/>/';
+			$preg_dllt='/<input type="hidden" name="dllt" value="(.*)"\/>/';
+			$preg_execution='/<input type="hidden" name="execution" value="(.*)"\/>/';
+			preg_match_all( $preg_lt, $con, $arr_lt );
+			preg_match_all( $preg_dllt, $con, $arr_dllt );
+			preg_match_all( $preg_execution, $con, $arr_execution );
+
+			$lt=$arr_lt[1][0];
+			$dllt=$arr_dllt[1][0];
+			$execution=$arr_execution[1][0];			
+			// echo $con;
+			echo "<hr/>";
+			curl_close($ch);
+
+
+			
+//设置post的数据 
+$post = array ( 
+    'username' => '20121043226', 
+    'password' => 'd003019',
+    'lt' => $lt, 
+    'dllt' => 'userNamePasswordLogin',	
+	'execution' => $execution,	
+	'_eventId' => 'submit',
+	'rmShown' => '1'
+); 
+// print_r($post);
+$url = "http://auth.cyu.edu.cn/authserver/login";
+ $con=login_post($url, $cookie_file, $post); 
+ @ unlink($cookie_file); 
+  echo $con;
+function login_post($url, $cookie, $post) { 
+    $curl = curl_init();//初始化curl模块 
+    curl_setopt($curl, CURLOPT_URL, $url);//登录提交的地址 
+    curl_setopt($curl, CURLOPT_HEADER, 0);//是否显示头信息 
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//是否自动显示返回的信息,将返回结果赋值给变量
+	curl_setopt($curl, CURLOPT_FOLLOWLOCATION,1);//如果返回的response 头部中存在Location值，就会递归请求   
+	curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie); //读取cookie 	
+    curl_setopt($curl, CURLOPT_POST, 1);//post方式提交 
+    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));//要提交的信息 
+	
+    $con=curl_exec($curl);//执行cURL 
+	// curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie); 	
+    curl_close($curl);//关闭cURL资源，并且释放系统资源 
+	return $con;
+} 
+
+?>
