@@ -1,6 +1,6 @@
 <?php
-$username='20121043226';
-$password='d003019';
+$username='1234566';
+$password='25642';
 
 $cookie_file = dirname(__FILE__) ."/$username-cookie.txt"; 
 //模拟登录 
